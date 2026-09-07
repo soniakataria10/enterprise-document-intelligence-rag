@@ -57,7 +57,6 @@ while ChromaDB provides persistent local vector storage.
 
 ## 🏗️ Architecture
 
-``` text
                          ┌─────────────────────────┐
                          │      Streamlit UI       │
                          └────────────┬────────────┘
@@ -125,8 +124,7 @@ while ChromaDB provides persistent local vector storage.
 
   PyMuPDF                             Native PDF text extraction
 
-  Tesseract + pytesseract             OCR fallback for scanned/low-text
-                                      pages
+  Tesseract + pytesseract             OCR fallback for scanned/low-text pages
 
   Pillow                              Image handling for OCR
   -----------------------------------------------------------------------
@@ -137,7 +135,6 @@ while ChromaDB provides persistent local vector storage.
 
 When a PDF is uploaded, the application processes it as follows:
 
-``` text
 Uploaded PDF
      │
      ▼
@@ -169,25 +166,19 @@ Does Hash Already Exist?
          │
          ▼
    Store in ChromaDB
-```
 
 ### Duplicate Document Detection
 
-Duplicate detection is based on the **actual PDF bytes**, not only the
-filename.
+Duplicate detection is based on the **actual PDF bytes**, not only the filename.
 
 For example, if these two files contain identical bytes:
 
-``` text
 employee-policy.pdf
 employee-policy-copy.pdf
-```
 
-they generate the same SHA-256 hash. The second upload is therefore
-skipped before it is permanently added to the knowledge base.
+they generate the same SHA-256 hash. The second upload is therefore skipped before it is permanently added to the knowledge base.
 
-This prevents redundant chunks, embeddings, vector-store entries, and
-unnecessary OCR/embedding work.
+This prevents redundant chunks, embeddings, vector-store entries, and unnecessary OCR/embedding work.
 
 ------------------------------------------------------------------------
 
@@ -216,10 +207,8 @@ list to reduce irrelevant context and improve answer grounding.
 
 The application supports follow-up questions such as:
 
-``` text
 User: What does the Human Rights Policy say about discrimination?
 User: What about harassment?
-```
 
 When required, the second question is rewritten into a standalone query
 before retrieval so the retriever receives enough context to find the
@@ -247,16 +236,10 @@ This allows the knowledge base to handle both:
 
 ## 🛡️ Hallucination Control
 
-The generation prompt instructs the LLM to answer using the retrieved
-document context.
-
 When the retrieval pipeline cannot find sufficiently relevant
 information, the application returns:
 
 > I couldn't find the answer in the provided documents.
-
-Additional controls include reranking, score filtering, context limits,
-and source attribution.
 
 ------------------------------------------------------------------------
 
@@ -279,15 +262,11 @@ including:
 
 Evaluation questions are defined in:
 
-``` text
-evaluation_data/questions.json
-```
+-   evaluation_data/questions.json
 
 Run evaluation with:
 
-``` powershell
-python evaluate.py
-```
+-   python evaluate.py
 
 Generated evaluation results are written locally and are excluded from
 Git.
@@ -296,7 +275,6 @@ Git.
 
 ## 📁 Project Structure
 
-``` text
 enterprise-document-intelligence-rag/
 │
 ├── app.py
@@ -349,7 +327,7 @@ enterprise-document-intelligence-rag/
 │
 ├── chroma_db/             # Generated locally; ignored by Git
 └── logs/                  # Generated locally; ignored by Git
-```
+
 
 ------------------------------------------------------------------------
 
@@ -370,31 +348,23 @@ and reranking models.
 
 ### 1. Clone the repository
 
-``` powershell
-git clone <your-repository-url>
+git clone https://github.com/soniakataria10/enterprise-document-intelligence-rag
 cd enterprise-document-intelligence-rag
-```
 
 ### 2. Create a virtual environment
 
-``` powershell
 python -m venv .venv
-```
 
 ### 3. Activate the virtual environment
 
 Windows PowerShell:
 
-``` powershell
 .\.venv\Scripts\Activate.ps1
-```
 
 ### 4. Install Python dependencies
 
-``` powershell
 python -m pip install --upgrade pip
 pip install -r requirements.txt
-```
 
 ------------------------------------------------------------------------
 
@@ -402,15 +372,11 @@ pip install -r requirements.txt
 
 Install Ollama and pull the model configured by the project:
 
-``` powershell
 ollama pull llama3.2
-```
 
 Verify that the model is available:
 
-``` powershell
 ollama list
-```
 
 Make sure Ollama is running before starting the application.
 
@@ -426,9 +392,7 @@ executable path.
 
 Example in PowerShell:
 
-``` powershell
 $env:TESSERACT_CMD="C:\Program Files\Tesseract-OCR\tesseract.exe"
-```
 
 The application checks `TESSERACT_CMD` first and otherwise attempts to
 locate Tesseract from the system `PATH`.
@@ -439,9 +403,7 @@ locate Tesseract from the system `PATH`.
 
 From the project root with the virtual environment activated:
 
-``` powershell
 streamlit run app.py
-```
 
 Then open the local Streamlit address shown in the terminal.
 
@@ -452,47 +414,37 @@ questions.
 
 ## 💬 Example Questions
 
-After uploading company policy documents, example questions include:
+After uploading company policy documents, example questions include:-
 
 ### Direct retrieval
 
-``` text
-What does the Human Rights Policy say about discrimination?
-What responsibilities do employees have regarding workplace health and safety?
-What does the Supplier Code of Conduct require from suppliers?
-```
+Q - What does the Human Rights Policy say about discrimination?
+Q - What responsibilities do employees have regarding workplace health and safety?
+Q - What does the Supplier Code of Conduct require from suppliers?
 
 ### Multi-document reasoning
 
-``` text
-How do the Human Rights Policy and Diversity and Inclusion Policy relate to each other?
-How do the Code of Business Conduct and Confidential Information Policy address employee responsibilities?
-Which policies could apply to a situation involving both harassment and discrimination?
-```
+Q - How do the Human Rights Policy and Diversity and Inclusion Policy relate to each other?
+Q - How do the Code of Business Conduct and Confidential Information Policy address employee responsibilities?
+Q - Which policies could apply to a situation involving both harassment and discrimination?
 
 ### Scenario-based
 
-``` text
-An employee receives confidential company information and wants to share it outside the company. What policies should they consider?
+Q - An employee receives confidential company information and wants to share it outside the company. What policies should they consider?
 
-An employee has a personal relationship with a supplier involved in a business decision. What should they do according to the relevant policies?
-```
+Q - An employee has a personal relationship with a supplier involved in a business decision. What should they do according to the relevant policies?
 
 ### Conversational follow-up
 
-``` text
-What does the Human Rights Policy say about discrimination?
-What about harassment?
-Who does that policy apply to?
-Which other policy is related to this?
-How are the two policies different?
-```
+Q - What does the Human Rights Policy say about discrimination?
+Q - What about harassment?
+Q - Who does that policy apply to?
+Q - Which other policy is related to this?
+Q - How are the two policies different?
 
 ### Out-of-scope
 
-``` text
-What is the population of Canada?
-```
+Q - What is the population of Canada?
 
 Expected behavior: the system should indicate that the answer could not
 be found in the provided documents instead of answering from general
@@ -509,39 +461,6 @@ The Streamlit sidebar supports:
 -   viewing document/chunk counts
 -   deleting an individual document and its ChromaDB chunks
 -   deleting all indexed PDF documents and chunks
-
-Uploaded PDFs, the generated Chroma database, logs, and evaluation
-result files are intentionally excluded from version control.
-
-------------------------------------------------------------------------
-
-## 🔧 Current Configuration
-
-Core RAG settings are centralized in `config.py`, including:
-
-``` text
-LLM_MODEL
-EMBEDDING_MODEL
-RERANKER_MODEL
-
-CHUNK_SIZE
-CHUNK_OVERLAP
-
-DENSE_K
-BM25_K
-RERANK_K
-RERANK_CANDIDATES
-RRF_K
-
-MIN_RERANK_SCORE
-RERANK_SCORE_GAP
-CONTEXT_MAX_CHUNKS
-SOURCE_MAX_COUNT
-MAX_HISTORY_MESSAGES
-```
-
-This keeps retrieval and generation behavior configurable without
-scattering constants throughout the application.
 
 ------------------------------------------------------------------------
 
@@ -573,49 +492,3 @@ separately when configuring an offline environment.
     different hash.
 -   The application does not currently provide distributed processing,
     multi-user authentication, or cloud-scale deployment.
-
-------------------------------------------------------------------------
-
-## 🔮 Possible Future Improvements
-
--   Add automated unit and integration tests.
--   Add retrieval/evaluation dashboards.
--   Add configurable embedding and LLM models.
--   Add semantic duplicate detection for re-saved PDFs.
--   Add support for additional document formats.
--   Add asynchronous/background document ingestion for large
-    collections.
--   Add containerized deployment.
--   Add production authentication and role-based access control.
--   Add observability for latency, retrieval quality, and model
-    performance.
-
-------------------------------------------------------------------------
-
-## 🎯 Project Purpose
-
-This project demonstrates practical implementation of an end-to-end RAG
-system, including:
-
--   document ingestion and OCR
--   content-based deduplication
--   vector embeddings and persistent storage
--   hybrid information retrieval
--   reranking
--   conversational query handling
--   context construction
--   grounded local LLM generation
--   source attribution
--   evaluation and monitoring
-
-It was built as a hands-on AI engineering portfolio project focused on
-understanding and implementing the major components of a modern RAG
-pipeline.
-
-------------------------------------------------------------------------
-
-## 📜 License
-
-This project is intended for educational and portfolio use. Add a
-license file if you plan to distribute or reuse the project under a
-specific open-source license.
