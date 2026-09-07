@@ -1,0 +1,19 @@
+langchain>=0.3
+langchain-community
+langchain-core
+langchain-chroma
+langchain-ollama
+langchain-huggingface
+chromadb
+sentence-transformers
+rank-bm25
+pymupdf
+streamlit
+langchain-text-splitters
+
+pytesseract
+pillow
+
+# python-docx
+# docx2txt
+# pandas

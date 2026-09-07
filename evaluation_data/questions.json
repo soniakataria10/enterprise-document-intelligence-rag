@@ -1,0 +1,208 @@
+[
+  {
+    "id":"Q001",
+    "question":"What percentage of the Cineplex Board does the Board Diversity Policy aspire to have represented by women?",
+    "expected_answer":"The Board aspires to have women comprise at least 30% of its members.",
+    "expected_sources":["Board-Diversity-Policy.2026.03.04.pdf"],
+    "required_facts": ["30%"],
+    "category":"factual"
+  },
+  {
+    "id":"Q002",
+    "question":"How often does the Cineplex Board review its Board Diversity Policy?",
+    "expected_answer":"The Board reviews the policy annually.",
+    "expected_sources":["Board-Diversity-Policy.2026.03.04.pdf"],
+    "required_facts": ["annually"],
+    "category":"factual"
+  },
+  {
+
+    "id":"Q003",
+    "question":"Who is covered by Cineplex's Code of Business Conduct and Ethics?",
+    "expected_answer":"The Code applies to directors, officers, employees, agents, representatives and advisors of Cineplex and its subsidiaries and affiliates, including operations such as The Rec Room and Playdium.",
+    "expected_sources":["Code-of-Business-Conduct-and-Ethics.2026.02.17.pdf"],
+    "required_facts": [
+    "directors",
+    "officers",
+    "employees",
+    "agents",
+    "representatives",
+    "advisors",
+    "subsidiaries",
+    "affiliates",
+    "The Rec Room",
+    "Playdium"
+    ],
+    "category":"scope"
+  },
+  {
+
+    "id":"Q004",
+    "question":"How often must full-time Cineplex Personnel agree to be bound by the Code of Business Conduct and Ethics?",
+    "expected_answer":"All full-time Cineplex Personnel must agree annually to be bound by the Code as a condition of continued employment.",
+    "expected_sources":["Code-of-Business-Conduct-and-Ethics.2026.02.17.pdf"],
+    "category":"factual"
+  },
+  {
+
+    "id":"Q005",
+    "question":"What does Cineplex's Code say about conflicts of interest?",
+    "expected_answer":"Conflicts of interest are prohibited and should be avoided as a matter of policy, except where they may be approved by the Board.",
+    "expected_sources":["Code-of-Business-Conduct-and-Ethics.2026.02.17.pdf"],
+    "required_facts": [
+    "prohibited",
+    "Board"
+    ],
+    "category":"policy"
+  },
+  {
+
+    "id":"Q006",
+    "question":"What is Cineplex Personnel required to do with confidential information?",
+    "expected_answer":"Cineplex Personnel must maintain the confidentiality of confidential information entrusted to them by Cineplex and persons with whom Cineplex does business, except when disclosure is authorized or otherwise permitted.",
+    "expected_sources":["Code-of-Business-Conduct-and-Ethics.2026.02.17.pdf","Confidential-Information-Policy.2026.03.04.pdf"],
+    "required_facts": ["confidential", "disclosure"],
+    "category":"multi_document"
+  },
+  {
+
+    "id":"Q007",
+    "question":"What is the purpose of Cineplex's Disclosure Policy?",
+    "expected_answer":"The policy establishes procedures for the disclosure process so that material information is disclosed to the public promptly and consistently.",
+    "expected_sources":["Disclosure-Policy.2026.03.04.pdf"],
+    "category":"policy"
+  },
+  {
+
+    "id":"Q008",
+    "question":"Does Cineplex's Disclosure Policy allow selective disclosure of previously undisclosed material information?",
+    "expected_answer":"No. Selective disclosure is prohibited.",
+    "expected_sources":["Disclosure-Policy.2026.03.04.pdf"],
+    "required_facts": ["no", "selective disclosure"],
+    "category":"yes_no"
+  },
+  {
+
+    "id":"Q009",
+    "question":"What is Cineplex's policy on workplace harassment, discrimination and violence?",
+    "expected_answer":"Cineplex is committed to providing a safe and inclusive work environment free from harassment, discrimination and violence and does not tolerate such conduct.",
+    "expected_sources":["Harassment, Discrimination and Workplace Violence Policy 2025 - PDF.pdf"],
+    "required_facts": ["safe", "harassment", "discrimination", "violence"],
+    "category":"policy"
+  },
+  {
+
+    "id":"Q010",
+    "question":"Who should an employee report harassment, discrimination or violence to?",
+    "expected_answer":"Employees should report instances of harassment, discrimination or violence to their manager or Human Resources.",
+    "expected_sources":["Harassment, Discrimination and Workplace Violence Policy 2025 - PDF.pdf"],
+    "required_facts": ["Human Resources"],
+    "category":"procedure"
+  },
+  {
+
+    "id":"Q011",
+    "question":"Who does the Cineplex Health & Safety Policy apply to?",
+    "expected_answer":"It applies to full-time and part-time employees and contractors on Cineplex controlled property.",
+    "expected_sources":["Health-and-Safety-Policy.2025.03.05.pdf"],
+    "category":"scope"
+  },
+  {
+
+    "id":"Q012",
+    "question":"What are employees required to do regarding incidents under Cineplex's Health & Safety Policy?",
+    "expected_answer":"Employees must report all incidents to management in accordance with Cineplex's incident reporting procedures.",
+    "expected_sources":["Health-and-Safety-Policy.2025.03.05.pdf"],
+    "category":"procedure"
+  },
+  {
+
+    "id":"Q013",
+    "question":"Who does Cineplex's Human Rights Policy apply to?",
+    "expected_answer":"The policy applies to all Cineplex employees, suppliers, partners, contractors and vendors.",
+    "expected_sources":["Human-Rights-Policy.2025.03.05.pdf"],
+    "category":"scope"
+  },
+  {
+
+    "id":"Q014",
+    "question":"What does Cineplex prohibit regarding forced or compulsory labour?",
+    "expected_answer":"Cineplex does not accept or condone forced or compulsory labour and strictly prohibits employees, suppliers and other business partners from engaging in human-trafficking-related activities or forced labour.",
+    "expected_sources":["Human-Rights-Policy.2025.03.05.pdf","Supplier-Code-of-Conduct.2026.02.13.pdf"],
+    "category":"multi_document"
+  },
+  {
+
+    "id":"Q015",
+    "question":"Can an insider trade Cineplex securities while aware of material non-public information?",
+    "expected_answer":"No. Directors, officers, executives, senior managers and deemed insiders may not purchase or sell Cineplex securities while aware of material non-public information.",
+    "expected_sources":["Insider-Trading-Guidelines.2026.03.04.pdf"],
+    "required_facts": [
+    "no",
+    "material non-public information"
+    ],
+    "category":"yes_no"
+  },
+  {
+    "id":"Q016",
+    "question":"How long after general disclosure of a material change must an insider wait before trading Cineplex securities?",
+    "expected_answer":"No purchase or sale should be made with knowledge of a material change for at least 48 hours after the change has been generally disclosed to the public.",
+    "expected_sources":["Insider-Trading-Guidelines.2026.03.04.pdf"],
+    "required_facts": ["48 hours"],
+    "category":"factual"
+  },
+  {
+    "id":"Q017",
+    "question":"What happens when withheld votes for a director nominee are greater than votes in favour in an uncontested election?",
+    "expected_answer":"The rejected nominee must immediately submit their resignation to the Chair of the Board following the shareholders' meeting.",
+    "expected_sources":["Majority-Voting-Policy.2026.03.04.pdf"],
+    "required_facts": [
+    "immediately",
+    "resignation"
+    ],
+    "category":"procedure"
+  },
+  {
+    "id":"Q018",
+    "question":"What is the minimum number of members required for Cineplex's Audit Committee?",
+    "expected_answer":"The Audit Committee must have at least three members of the Board.",
+    "expected_sources":["Terms-of-Reference-Audit-Committee.2026.03.04.pdf"],
+    "category":"factual"
+  },
+  {
+    "id":"Q019",
+    "question":"What responsibilities does Cineplex's Audit Committee have regarding financial statements?",
+    "expected_answer":"The Audit Committee reviews the annual audited financial statements and interim unaudited financial results before public disclosure and, after review with management and the Auditors, recommends approval of those financial statements to the Board.",
+    "expected_sources":["Terms-of-Reference-Audit-Committee.2026.03.04.pdf"],
+    "required_facts": [
+      "annual audited financial statements",
+      "interim unaudited financial results",
+      "before public disclosure",
+      "recommends approval"
+      ],
+    "category":"multi_part"
+  },
+  {
+    "id":"Q020",
+    "question":"What does the Supplier Code of Conduct require suppliers to do regarding employee identification documents?",
+    "expected_answer":"Suppliers must not retain employees' government-issued identification, passports or work permits as a condition of employment and must allow employees to resign at any time.",
+    "expected_sources":["Supplier-Code-of-Conduct.2026.02.13.pdf"],
+    "category":"policy"
+  },
+  {
+    "id":"Q021",
+    "question":"What is Cineplex's employee relocation allowance?",
+    "expected_answer":null,
+    "expected_sources":[],
+    "required_facts": [],
+    "category":"out_of_scope"
+  },
+  {
+    "id":"Q022",
+    "question":"How many vacation days does every Cineplex employee receive each year?",
+    "expected_answer":null,
+    "expected_sources":[],
+    "required_facts": [],
+    "category":"out_of_scope"
+  }
+]
