@@ -15,6 +15,24 @@ while ChromaDB provides persistent local vector storage.
 
 ------------------------------------------------------------------------
 
+## 📸 Application Screenshots
+
+### RAG Main Interface
+![RAG MAin Page](assets/1-rag-main-interface.png)
+
+### RAG Question Answering
+![RAG Question Answering](assets/6-conversational-rag-answer-with-sources.png)
+
+### Knowledge Base
+![Upload Multile PDFs](assets/2-multiple-uploads.png)
+![Check for duplicate file at Bytes level](assets/3-detect-byte-level-identical-file.png)
+![Upload Message](assets/4-upload-message.png)
+
+### Delete Confirmation
+![Delete PDF confirmation popup](assets/5-delete-file-and-chunks.png)
+
+------------------------------------------------------------------------
+
 ## ✨ Key Features
 
 -   **Multi-PDF knowledge base** --- Upload and incrementally index one
