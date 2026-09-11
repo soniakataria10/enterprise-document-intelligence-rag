@@ -1,4 +1,4 @@
-from evaluation.metrics import normalize_text, evaluate_required_facts, evaluate_out_of_scope
+from evaluation import normalize_text, evaluate_required_facts, evaluate_out_of_scope
 
 def test_normalize_text():
     text = "Board Diversity: 30% Women!"
