@@ -1,6 +1,7 @@
 from sentence_transformers import CrossEncoder
 from config import RERANKER_MODEL, RERANK_K
- 
+
+
 class Reranker:
     def __init__(self):
         self.model = CrossEncoder(RERANKER_MODEL)
@@ -13,11 +14,8 @@ class Reranker:
         for doc in documents:
             source = doc.metadata.get("source", "unknown")
 
-            document_text = (
-                f"Document: {source}\n"
-                f"Content: {doc.page_content}"
-            )
-            pairs.append((query,document_text))
+            document_text = f"Document: {source}\nContent: {doc.page_content}"
+            pairs.append((query, document_text))
 
         scores = self.model.predict(pairs)
         ranked = sorted(

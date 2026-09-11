@@ -6,6 +6,7 @@ from config import DENSE_K, BM25_K, RERANK_CANDIDATES, RRF_K
 def tokenize(text):
     return re.findall(r"(?u)\b\w+\b", text.lower())
 
+
 def document_key(doc):
 
     return (
@@ -15,6 +16,7 @@ def document_key(doc):
         doc.page_content[:100],
     )
 
+
 class HybridRetriever:
     def __init__(self, vector_store, documents):
         self.vector_store = vector_store
@@ -23,30 +25,25 @@ class HybridRetriever:
         if documents:
             tokenized_documents = []
             for doc in documents:
-                source = doc.metadata.get("source","")
-                searchable_text = (
-                    f"{source} "
-                    f"{doc.page_content}"
-                )
+                source = doc.metadata.get("source", "")
+                searchable_text = f"{source} {doc.page_content}"
                 tokenized_documents.append(tokenize(searchable_text))
 
             self.bm25 = BM25Okapi(tokenized_documents)
         else:
             self.bm25 = None
 
-    def retrieve(self, query, dense_k=DENSE_K, bm25_k=BM25_K, candidate_k=RERANK_CANDIDATES, rrf_k=RRF_K):
+    def retrieve(
+        self, query, dense_k=DENSE_K, bm25_k=BM25_K, candidate_k=RERANK_CANDIDATES, rrf_k=RRF_K
+    ):
 
-        if not self.documents: return[]
+        if not self.documents:
+            return []
 
-        dense = self.vector_store.similarity_search_with_score(
-            query, k=dense_k
-        )
+        dense = self.vector_store.similarity_search_with_score(query, k=dense_k)
         dense_docs = []
         for doc, score in dense:
-            doc.metadata = {
-                **doc.metadata, 
-                "dense_distance": float(score)
-                }
+            doc.metadata = {**doc.metadata, "dense_distance": float(score)}
             dense_docs.append(doc)
 
         bm25_docs = []
@@ -57,10 +54,7 @@ class HybridRetriever:
 
             for idx, score in ranked[:bm25_k]:
                 doc = self.documents[idx]
-                doc.metadata = {
-                    **doc.metadata, 
-                    "bm25_score": float(score)
-                    }
+                doc.metadata = {**doc.metadata, "bm25_score": float(score)}
                 bm25_docs.append(doc)
 
         fused = {}
@@ -68,23 +62,16 @@ class HybridRetriever:
         def add_results(documents, retrieval_type):
 
             for rank, doc in enumerate(documents, start=1):
-
                 key = document_key(doc)
                 if key not in fused:
-
                     fused[key] = {
                         "doc": doc,
                         "score": 0.0,
                     }
 
-                fused[key]["score"] += (
-                    1.0 /
-                    (rrf_k + rank)
-                )
+                fused[key]["score"] += 1.0 / (rrf_k + rank)
 
-                doc.metadata[
-                    f"{retrieval_type}_rank"
-                ] = rank
+                doc.metadata[f"{retrieval_type}_rank"] = rank
 
         add_results(dense_docs, "dense")
 
@@ -99,12 +86,8 @@ class HybridRetriever:
         results = []
 
         for item in ranked_fused[:candidate_k]:
-
             doc = item["doc"]
-            doc.metadata["rrf_score"] = (
-                item["score"]
-            )
+            doc.metadata["rrf_score"] = item["score"]
             results.append(doc)
 
         return results
-    

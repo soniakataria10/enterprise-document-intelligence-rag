@@ -1,0 +1,17 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+exclude = [
+    ".venv",
+    "chroma_db",
+    "data",
+    "logs",
+    "evaluation_data",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+]

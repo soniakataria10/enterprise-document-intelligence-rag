@@ -1,5 +1,6 @@
 from langchain_chroma import Chroma
-from config import CHROMA_PATH, COLLECTION_NAME 
+from config import CHROMA_PATH, COLLECTION_NAME
+
 
 def create_store(documents, embeddings):
     store = Chroma(
@@ -11,6 +12,7 @@ def create_store(documents, embeddings):
         store.add_documents(documents)
     return store
 
+
 def load_store(embeddings):
     return Chroma(
         collection_name=COLLECTION_NAME,
@@ -18,9 +20,11 @@ def load_store(embeddings):
         persist_directory=str(CHROMA_PATH),
     )
 
+
 def reset_store():
     # Import lazily so the app can start without an initialized DB.
     import chromadb
+
     client = chromadb.PersistentClient(path=str(CHROMA_PATH))
     try:
         client.delete_collection(COLLECTION_NAME)
