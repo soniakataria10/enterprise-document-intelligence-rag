@@ -1,20 +1,15 @@
 from generation.prompts import REWRITE_PROMPT
-from langchain_core.messages import HumanMessage, SystemMessage
 
 
 def rewrite_query(llm, question, history):
     if not history:
         return question
 
-    history_text = "\n".join(
-        f"{message['role']}: "
-        f"{message['content']}"
-        for message in history[-6:]
-    )
+    history_text = "\n".join(f"{message['role']}: {message['content']}" for message in history[-6:])
     messages = REWRITE_PROMPT.format_messages(
-            history=history_text,
-            question=question,
-        )
+        history=history_text,
+        question=question,
+    )
 
     response = llm.invoke(messages)
 
@@ -64,10 +59,7 @@ def needs_rewrite(question, history):
         "she",
     }
 
-    words = {
-        word.strip(".,?!:;").lower()
-        for word in question.split()
-    }
+    words = {word.strip(".,?!:;").lower() for word in question.split()}
 
     if words & reference_words:
         return True

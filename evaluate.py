@@ -125,11 +125,7 @@ FAIL
     try:
         response = llm.invoke(prompt)
 
-        judge_text = (
-            response.content
-            if hasattr(response, "content")
-            else str(response)
-        )
+        judge_text = response.content if hasattr(response, "content") else str(response)
 
         judge_text = judge_text.strip().upper()
 
@@ -165,16 +161,13 @@ def calculate_answer_pass(required_facts_passed, llm_judge_passed, answer_simila
         return llm_judge_passed
 
     if answer_similarity is not None:
-        return (
-            answer_similarity
-            >= ANSWER_SIMILARITY_THRESHOLD
-        )
+        return answer_similarity >= ANSWER_SIMILARITY_THRESHOLD
 
     return False
 
 
 def extract_sources(result):
-    """Extract unique source filenames from result['sources'].""" 
+    """Extract unique source filenames from result['sources']."""
     sources = set()
 
     for source in result.get("sources", []):
@@ -193,10 +186,7 @@ def extract_sources(result):
                 sources.add(str(filename))
 
         elif hasattr(source, "metadata"):
-            filename = (
-                source.metadata.get("source")
-                or source.metadata.get("document_id")
-            )
+            filename = source.metadata.get("source") or source.metadata.get("document_id")
 
             if filename:
                 sources.add(str(filename))
@@ -244,14 +234,16 @@ def extract_reranked_candidates(result):
         else:
             display_page = "N/A"
 
-        candidates.append({
-            "source": doc.metadata.get("source", "unknown"),
-            "page": display_page,
-            "rerank_score": doc.metadata.get("rerank_score"),
-            "rrf_score": doc.metadata.get("rrf_score"),
-            "dense_rank": doc.metadata.get("dense_rank"),
-            "bm25_rank": doc.metadata.get("bm25_rank"),
-        })
+        candidates.append(
+            {
+                "source": doc.metadata.get("source", "unknown"),
+                "page": display_page,
+                "rerank_score": doc.metadata.get("rerank_score"),
+                "rrf_score": doc.metadata.get("rrf_score"),
+                "dense_rank": doc.metadata.get("dense_rank"),
+                "bm25_rank": doc.metadata.get("bm25_rank"),
+            }
+        )
 
     return candidates
 
@@ -264,11 +256,7 @@ def calculate_retrieval_recall(reranked_candidates, expected_sources):
     if not expected_sources:
         return None
 
-    retrieved_sources = {
-        item.get("source")
-        for item in reranked_candidates
-        if item.get("source")
-    }
+    retrieved_sources = {item.get("source") for item in reranked_candidates if item.get("source")}
 
     expected = set(expected_sources)
 
@@ -300,23 +288,16 @@ def evaluate_out_of_scope(answer):
         "context does not contain",
     ]
 
-    return any(
-        phrase in answer_lower
-        for phrase in fallback_phrases
-    )
+    return any(phrase in answer_lower for phrase in fallback_phrases)
 
 
 def main():
     dataset_path = EVAL_FOLDER / "questions.json"
 
     if not dataset_path.exists():
-        raise SystemExit(
-            "Create evaluation_data/questions.json first."
-        )
+        raise SystemExit("Create evaluation_data/questions.json first.")
 
-    data = json.loads(
-        dataset_path.read_text(encoding="utf-8")
-    )
+    data = json.loads(dataset_path.read_text(encoding="utf-8"))
 
     print("Initializing RAG system...")
 
@@ -336,10 +317,7 @@ def main():
     ]
 
     if not documents:
-        raise SystemExit(
-            "No indexed chunks were found. "
-            "Upload and ingest documents first."
-        )
+        raise SystemExit("No indexed chunks were found. Upload and ingest documents first.")
 
     retriever = HybridRetriever(store, documents)
     reranker = Reranker()
@@ -475,34 +453,25 @@ def main():
                 )
 
                 if retrieval_recall is not None:
-                    retrieval_recall_scores.append(
-                        retrieval_recall
-                    )
+                    retrieval_recall_scores.append(retrieval_recall)
 
         else:
             out_of_scope_tests += 1
 
-            out_of_scope_passed = evaluate_out_of_scope(
-                actual_answer
-            )
+            out_of_scope_passed = evaluate_out_of_scope(actual_answer)
 
             if out_of_scope_passed:
                 out_of_scope_passes += 1
 
             out_of_scope_clean_source_tests += 1
 
-            out_of_scope_sources_clean = (
-                len(actual_sources) == 0
-            )
+            out_of_scope_sources_clean = len(actual_sources) == 0
 
             if out_of_scope_sources_clean:
                 out_of_scope_clean_source_passes += 1
 
         if category == "out_of_scope":
-            overall_pass = (
-                bool(out_of_scope_passed)
-                and bool(out_of_scope_sources_clean)
-            )
+            overall_pass = bool(out_of_scope_passed) and bool(out_of_scope_sources_clean)
         else:
             checks = []
 
@@ -556,9 +525,7 @@ def main():
                 )
                 print(
                     "Required facts:",
-                    "PASS"
-                    if required_facts_passed
-                    else "FAIL",
+                    "PASS" if required_facts_passed else "FAIL",
                 )
 
                 if missing_facts:
@@ -566,16 +533,12 @@ def main():
 
             print(
                 "LLM judge:",
-                "PASS"
-                if llm_judge_passed
-                else "FAIL",
+                "PASS" if llm_judge_passed else "FAIL",
             )
 
             print(
                 "Answer:",
-                "PASS"
-                if answer_passed
-                else "FAIL",
+                "PASS" if answer_passed else "FAIL",
             )
 
         if expected_sources:
@@ -601,104 +564,60 @@ def main():
             )
             print(
                 "Source:",
-                "PASS"
-                if source_passed
-                else "FAIL",
+                "PASS" if source_passed else "FAIL",
             )
 
         if category == "out_of_scope":
             print(
                 "\nOut-of-scope handling:",
-                "PASS"
-                if out_of_scope_passed
-                else "FAIL",
+                "PASS" if out_of_scope_passed else "FAIL",
             )
             print(
                 "No sources returned:",
-                "PASS"
-                if out_of_scope_sources_clean
-                else "FAIL",
+                "PASS" if out_of_scope_sources_clean else "FAIL",
             )
 
-        print(
-            f"\nResponse time: {latency:.2f}s"
-        )
+        print(f"\nResponse time: {latency:.2f}s")
         print(
             "OVERALL:",
-            "PASS"
-            if overall_pass
-            else "FAIL",
+            "PASS" if overall_pass else "FAIL",
         )
 
-    answer_accuracy = (
-        answer_passes / answer_tests * 100
-        if answer_tests
-        else 0
-    )
+    answer_accuracy = answer_passes / answer_tests * 100 if answer_tests else 0
 
-    source_accuracy = (
-        source_passes / source_tests * 100
-        if source_tests
-        else 0
-    )
+    source_accuracy = source_passes / source_tests * 100 if source_tests else 0
 
     average_source_recall = (
-        sum(source_recall_scores)
-        / len(source_recall_scores)
-        * 100
-        if source_recall_scores
-        else 0
+        sum(source_recall_scores) / len(source_recall_scores) * 100 if source_recall_scores else 0
     )
 
     average_source_precision = (
-        sum(source_precision_scores)
-        / len(source_precision_scores)
-        * 100
+        sum(source_precision_scores) / len(source_precision_scores) * 100
         if source_precision_scores
         else 0
     )
 
     average_retrieval_recall = (
-        sum(retrieval_recall_scores)
-        / len(retrieval_recall_scores)
-        * 100
+        sum(retrieval_recall_scores) / len(retrieval_recall_scores) * 100
         if retrieval_recall_scores
         else 0
     )
 
     out_of_scope_accuracy = (
-        out_of_scope_passes
-        / out_of_scope_tests
-        * 100
-        if out_of_scope_tests
-        else 0
+        out_of_scope_passes / out_of_scope_tests * 100 if out_of_scope_tests else 0
     )
 
     out_of_scope_source_cleanliness = (
-        out_of_scope_clean_source_passes
-        / out_of_scope_clean_source_tests
-        * 100
+        out_of_scope_clean_source_passes / out_of_scope_clean_source_tests * 100
         if out_of_scope_clean_source_tests
         else 0
     )
 
-    overall_passes = sum(
-        1
-        for result in results
-        if result["overall_pass"]
-    )
+    overall_passes = sum(1 for result in results if result["overall_pass"])
 
-    overall_accuracy = (
-        overall_passes / len(results) * 100
-        if results
-        else 0
-    )
+    overall_accuracy = overall_passes / len(results) * 100 if results else 0
 
-    average_latency = (
-        total_latency / len(results)
-        if results
-        else 0
-    )
+    average_latency = total_latency / len(results) if results else 0
 
     summary = {
         "total_questions": len(results),
@@ -756,74 +675,41 @@ def main():
 
     print(f"Total Questions:              {len(results)}")
     print(f"Passed:                       {overall_passes}")
-    print(
-        f"Failed:                       "
-        f"{len(results) - overall_passes}"
-    )
+    print(f"Failed:                       {len(results) - overall_passes}")
     print(f"Overall Accuracy:             {overall_accuracy:.2f}%")
 
     print("-" * 70)
 
     print(f"Answer Accuracy:              {answer_accuracy:.2f}%")
     print(f"Source Accuracy:              {source_accuracy:.2f}%")
-    print(
-        f"Average Source Recall:        "
-        f"{average_source_recall:.2f}%"
-    )
-    print(
-        f"Average Source Precision:     "
-        f"{average_source_precision:.2f}%"
-    )
-    print(
-        f"Average Retrieval Recall:     "
-        f"{average_retrieval_recall:.2f}%"
-    )
-    print(
-        f"Out-of-Scope Accuracy:        "
-        f"{out_of_scope_accuracy:.2f}%"
-    )
-    print(
-        f"Out-of-Scope Source Clean:    "
-        f"{out_of_scope_source_cleanliness:.2f}%"
-    )
-    print(
-        f"Average Response Time:        "
-        f"{average_latency:.2f}s"
-    )
+    print(f"Average Source Recall:        {average_source_recall:.2f}%")
+    print(f"Average Source Precision:     {average_source_precision:.2f}%")
+    print(f"Average Retrieval Recall:     {average_retrieval_recall:.2f}%")
+    print(f"Out-of-Scope Accuracy:        {out_of_scope_accuracy:.2f}%")
+    print(f"Out-of-Scope Source Clean:    {out_of_scope_source_cleanliness:.2f}%")
+    print(f"Average Response Time:        {average_latency:.2f}s")
 
     print("=" * 70)
 
-    failed_results = [
-        result
-        for result in results
-        if not result["overall_pass"]
-    ]
+    failed_results = [result for result in results if not result["overall_pass"]]
 
     if failed_results:
         print("\nFAILED QUESTIONS")
         print("-" * 70)
 
         for result in failed_results:
-            print(
-                f"\n{result['id']}: "
-                f"{result['question']}"
-            )
+            print(f"\n{result['id']}: {result['question']}")
 
             if result["answer_passed"] is False:
                 if result["required_facts_passed"] is False:
-                    print(
-                        "Reason: Required facts were missing."
-                    )
+                    print("Reason: Required facts were missing.")
                     print(
                         "Missing facts:",
                         result["missing_facts"],
                     )
 
                 if result["llm_judge_passed"] is False:
-                    print(
-                        "Reason: Local LLM judge marked "
-                        "the answer incorrect."
-                    )
+                    print("Reason: Local LLM judge marked the answer incorrect.")
 
                 print(
                     "Semantic similarity (diagnostic):",
@@ -831,10 +717,7 @@ def main():
                 )
 
             if result["source_passed"] is False:
-                print(
-                    "Reason: Not all expected sources "
-                    "were returned."
-                )
+                print("Reason: Not all expected sources were returned.")
                 print(
                     "Source recall:",
                     result["source_recall"],
@@ -845,16 +728,10 @@ def main():
                 )
 
             if result["out_of_scope_passed"] is False:
-                print(
-                    "Reason: RAG did not correctly reject "
-                    "the out-of-scope question."
-                )
+                print("Reason: RAG did not correctly reject the out-of-scope question.")
 
             if result["out_of_scope_sources_clean"] is False:
-                print(
-                    "Reason: Fallback answer still "
-                    "returned sources."
-                )
+                print("Reason: Fallback answer still returned sources.")
 
             if result["retrieval_recall"] is not None:
                 print(
@@ -862,9 +739,7 @@ def main():
                     result["retrieval_recall"],
                 )
 
-    print(
-        f"\nDetailed results saved to:\n{out}"
-    )
+    print(f"\nDetailed results saved to:\n{out}")
 
 
 if __name__ == "__main__":

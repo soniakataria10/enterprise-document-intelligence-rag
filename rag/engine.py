@@ -1,14 +1,12 @@
 from generation.prompts import ANSWER_PROMPT
 from config import MIN_RERANK_SCORE, SOURCE_MAX_COUNT, CONTEXT_MAX_CHUNKS, RERANK_SCORE_GAP
 
+
 def format_context(docs):
     parts = []
 
     for doc in docs:
-        source = doc.metadata.get(
-            "source",
-            "unknown"
-        )
+        source = doc.metadata.get("source", "unknown")
 
         page = doc.metadata.get("page")
 
@@ -17,23 +15,20 @@ def format_context(docs):
         else:
             page = "N/A"
 
-        parts.append(
-            f"Document: {source}\n"
-            f"Page: {page}\n"
-            f"Content:\n{doc.page_content}"
-        )
+        parts.append(f"Document: {source}\nPage: {page}\nContent:\n{doc.page_content}")
 
     return "\n\n---\n\n".join(parts)
 
+
 def build_sources(docs, max_sources):
 
-    if not docs: return []
+    if not docs:
+        return []
 
     sources = []
     seen = set()
 
     for doc in docs:
-
         source = doc.metadata.get("source", "unknown")
         page = doc.metadata.get("page")
 
@@ -50,15 +45,18 @@ def build_sources(docs, max_sources):
 
         seen.add(key)
 
-        sources.append({
-            "source": source,
-            "page": page,
-            "score": score,
-        })
+        sources.append(
+            {
+                "source": source,
+                "page": page,
+                "score": score,
+            }
+        )
         if len(sources) >= max_sources:
             break
 
     return sources
+
 
 def filter_relevant_docs(docs, max_score_gap, max_docs):
 
@@ -79,7 +77,7 @@ def filter_relevant_docs(docs, max_score_gap, max_docs):
             continue
 
         # COMPARE DIFFERENCE BETWEEN BEST RESULTS
-        if (best_score - score > max_score_gap):
+        if best_score - score > max_score_gap:
             continue
 
         relevant.append(doc)
@@ -97,15 +95,15 @@ class RAGEngine:
         self.reranker = reranker
 
     def answer(self, question):
-        
+
         candidates = self.retriever.retrieve(question)
 
         if not candidates:
-            return{
+            return {
                 "answer": "I couldn't find the answer in the provided documents.",
                 "sources": [],
                 "retrieved": [],
-                "reranked": []
+                "reranked": [],
             }
 
         reranked = self.reranker.rerank(question, candidates)
@@ -115,28 +113,31 @@ class RAGEngine:
                 "answer": "I couldn't find the answer in the provided documents.",
                 "sources": [],
                 "retrieved": [],
-                "reranked": []
+                "reranked": [],
             }
 
         best_score = reranked[0].metadata.get("rerank_score", float("-inf"))
 
-        if (best_score < MIN_RERANK_SCORE):
+        if best_score < MIN_RERANK_SCORE:
             return {
                 "answer": "I couldn't find the answer in the provided documents.",
                 "sources": [],
                 "retrieved": [],
-                "reranked": reranked
+                "reranked": reranked,
             }
 
-        relevant_docs = filter_relevant_docs(reranked, max_score_gap=RERANK_SCORE_GAP,max_docs=CONTEXT_MAX_CHUNKS)
+        relevant_docs = filter_relevant_docs(
+            reranked,
+            max_score_gap=RERANK_SCORE_GAP,
+            max_docs=CONTEXT_MAX_CHUNKS,
+        )
 
         if not relevant_docs:
-
             return {
                 "answer": "I couldn't find the answer in the provided documents.",
                 "sources": [],
                 "retrieved": [],
-                "reranked": reranked
+                "reranked": reranked,
             }
 
         context = format_context(relevant_docs)
@@ -151,16 +152,10 @@ class RAGEngine:
         answer = response.content.strip()
 
         # 6. Handle LLM fallback
-        fallback = ("I couldn't find the answer in the provided documents.")
+        fallback = "I couldn't find the answer in the provided documents."
 
         if fallback.lower() in answer.lower():
-
-            return {
-                "answer": fallback,
-                "sources": [],
-                "retrieved": [],
-                "reranked": reranked
-            }
+            return {"answer": fallback, "sources": [], "retrieved": [], "reranked": reranked}
 
         sources = build_sources(relevant_docs, max_sources=SOURCE_MAX_COUNT)
 
@@ -168,5 +163,5 @@ class RAGEngine:
             "answer": response.content,
             "sources": sources,
             "retrieved": relevant_docs,
-            "reranked": reranked
+            "reranked": reranked,
         }
