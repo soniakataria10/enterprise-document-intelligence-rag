@@ -56,6 +56,9 @@ jobs:
       - name: Build Docker image
         run: docker build -t enterprise-rag .
     
+      - name: Validate Docker Compose
+        run: docker compose config
+        
   publish:
     needs:
       - test
