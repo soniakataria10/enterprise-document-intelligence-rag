@@ -1,0 +1,16 @@
+services:
+  rag-app:
+    image: ghcr.io/soniakataria10/enterprise-rag:latest
+    container_name: enterprise-rag-app
+
+    ports:
+      - "8501:8501"
+
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+
+    volumes:
+      - ./data/documents:/app/data/documents
+      - ./chroma_db:/app/chroma_db
+
+    restart: unless-stopped
