@@ -70,6 +70,9 @@ while ChromaDB provides persistent local vector storage.
     out-of-scope, and LLM-judge evaluation.
 -   **Local event logging** --- Records RAG events for monitoring and
     debugging.
+-   **Dockerized runtime** --- Packages the Streamlit application and OCR dependencies in a reproducible container.
+-   **Docker Compose deployment** --- Runs the published application image with persistent document and ChromaDB mounts and host Ollama connectivity.
+-   **CI/CD automation** --- GitHub Actions runs syntax checks, Ruff linting, pytest/coverage, Docker and Compose validation, and publishes multi-platform images to GHCR after merges to `main`.
 
 ------------------------------------------------------------------------
 
@@ -90,10 +93,10 @@ while ChromaDB provides persistent local vector storage.
                     ▼                                   ▼
        PyMuPDF Text Extraction                  Standalone Query
                     │                                   │
-          Low text? ─┴─ Yes                              ▼
+          Low text? ┴─ Yes                              ▼
                     │                         ┌─────────────────────┐
                     ▼                         │  Hybrid Retrieval   │
-             Tesseract OCR                    │ Dense + BM25 + RRF │
+             Tesseract OCR                    │ Dense + BM25 + RRF  │
                     │                         └──────────┬──────────┘
                     ▼                                    │
               Text Chunking                              ▼
@@ -300,8 +303,16 @@ enterprise-document-intelligence-rag/
 ├── ingest.py
 ├── evaluate.py
 ├── requirements.txt
+├── requirements-dev.txt
+├── pyproject.toml
+├── Dockerfile
+├── compose.yaml
 ├── README.md
 ├── .gitignore
+├── .dockerignore
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 │
 ├── app/
 │   └── __init__.py
@@ -351,38 +362,112 @@ enterprise-document-intelligence-rag/
 
 ## ⚙️ Prerequisites
 
-Before running the project, install:
+Choose one of the following ways to run the project.
 
--   **Python 3.11 or 3.12** recommended
--   **Ollama**
--   **Tesseract OCR**
+### Docker Compose (recommended for running the application)
 
-The first run may also download the configured Hugging Face embedding
-and reranking models.
+Install:
+
+- **Git**
+- **Docker Desktop**
+- **Ollama**
+
+The application container includes the Python runtime and Tesseract OCR. Ollama runs on the host machine and is accessed from the container.
+
+### Local Python development
+
+Install:
+
+- **Python 3.11 or 3.12** recommended
+- **Ollama**
+- **Tesseract OCR**
+
+The first run may download the configured Hugging Face embedding and reranking models.
 
 ------------------------------------------------------------------------
 
-## 🚀 Installation
+## 🚀 Quick Start with Docker Compose
 
 ### 1. Clone the repository
 
+```bash
 git clone https://github.com/soniakataria10/enterprise-document-intelligence-rag
 cd enterprise-document-intelligence-rag
+```
+
+### 2. Configure Ollama
+
+Pull the model used by the project:
+
+```bash
+ollama pull llama3.2
+```
+
+Verify that Ollama is running and the model is available:
+
+```bash
+ollama list
+```
+
+### 3. Pull the published container image
+
+```bash
+docker compose pull
+```
+
+### 4. Start the application
+
+```bash
+docker compose up -d
+```
+
+Open `http://localhost:8501`, upload one or more PDFs from the Knowledge Base sidebar, and begin asking questions.
+
+### 5. View logs or stop the application
+
+```bash
+docker compose logs -f
+```
+
+```bash
+docker compose down
+```
+
+The Compose configuration mounts `./data/documents` and `./chroma_db` into the container so uploaded documents and the vector store persist when the container is recreated.
+
+------------------------------------------------------------------------
+
+## 🐍 Local Python Development Setup
+
+Use this option when modifying or debugging the Python application directly.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/soniakataria10/enterprise-document-intelligence-rag
+cd enterprise-document-intelligence-rag
+```
 
 ### 2. Create a virtual environment
 
+```bash
 python -m venv .venv
+```
 
 ### 3. Activate the virtual environment
 
 Windows PowerShell:
 
+```powershell
 .\.venv\Scripts\Activate.ps1
+```
 
 ### 4. Install Python dependencies
 
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
 
 ------------------------------------------------------------------------
 
@@ -427,6 +512,67 @@ Then open the local Streamlit address shown in the terminal.
 
 Upload one or more PDFs from the Knowledge Base sidebar and start asking
 questions.
+
+------------------------------------------------------------------------
+
+## 🧪 Testing and Code Quality
+
+Development dependencies are defined in `requirements-dev.txt`. After activating the virtual environment, install them with:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run the same core checks used by CI:
+
+```bash
+python -m compileall .
+ruff check .
+python -m pytest --cov=. --cov-report=term-missing
+```
+
+The automated tests focus on deterministic application/evaluation behavior so pull-request CI remains fast and does not require a running Ollama model or a populated production knowledge base. Full RAG evaluation can be run separately with `python evaluate.py`.
+
+------------------------------------------------------------------------
+
+## 🔄 CI/CD Pipeline
+
+The repository uses GitHub Actions for continuous integration and container delivery.
+
+### Pull requests to `main`
+
+The workflow validates changes with:
+
+- Python syntax compilation
+- Ruff linting
+- pytest unit tests and code coverage
+- Docker image build validation
+- Docker Compose configuration validation
+
+### After merge to `main`
+
+After the CI jobs succeed, the workflow builds and publishes multi-platform container images for `linux/amd64` and `linux/arm64` to GitHub Container Registry (GHCR). Images are tagged with both `latest` and the Git commit SHA for traceability.
+
+Published image:
+
+```text
+ghcr.io/soniakataria10/enterprise-rag:latest
+```
+
+The published image can then be pulled and run with Docker Compose without rebuilding the Python application locally. The project currently automates validation, container build, and image publishing; deployment to a hosted production environment is not automated.
+
+------------------------------------------------------------------------
+
+## 💾 Persistent Local Data
+
+Docker Compose uses host bind mounts for runtime data:
+
+```text
+./data/documents  -> /app/data/documents
+./chroma_db       -> /app/chroma_db
+```
+
+This keeps uploaded PDFs and ChromaDB data outside the container lifecycle. Running `docker compose down` removes the container but does not remove these host directories.
 
 ------------------------------------------------------------------------
 
@@ -501,12 +647,8 @@ separately when configuring an offline environment.
 -   Supports PDF ingestion only.
 -   OCR is currently configured for English (`eng`).
 -   The application is designed primarily for local/single-user use.
--   Retrieval thresholds are configuration-based and may require tuning
-    for different document collections.
 -   Local inference speed depends on the machine running Ollama and the
     selected model.
--   Byte-level SHA-256 detects identical files; a visually identical PDF
-    that has been re-saved with different underlying bytes may produce a
-    different hash.
--   The application does not currently provide distributed processing,
+-   The application does not currently provide
     multi-user authentication, or cloud-scale deployment.
+-   Docker deployment still requires an Ollama service running on the host machine; the current Compose configuration is intended for local use.
